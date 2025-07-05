@@ -2,7 +2,7 @@
 
 This project implements a comprehensive EDA (Exploratory Data Analysis) and preprocessing pipeline for CFPB (Consumer Financial Protection Bureau) complaints data.
 
-## Project Structure
+## Project Structure 
 
 ```
 Intelligent-Complaint-Analysis-for-Financial-Services/
