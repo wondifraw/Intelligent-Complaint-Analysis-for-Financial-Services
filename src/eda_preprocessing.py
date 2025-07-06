@@ -9,13 +9,20 @@ import string
 class ComplaintAnalyzer:
     """
     A class for performing exploratory data analysis and preprocessing on CFPB complaints data.
+
+    Example:
+        >>> analyzer = ComplaintAnalyzer('data/complaints.csv')
+        >>> analyzer.initial_eda()
+        >>> analyzer.filter_dataset()
+        >>> analyzer.clean_narratives()
     """
     
-    def __init__(self, filepath_or_df=None):
+    def __init__(self, filepath_or_df: 'str | pd.DataFrame' = None):
         """
         Initialize the ComplaintAnalyzer.
+
         Args:
-            filepath_or_df (str or pd.DataFrame, optional): Path to the complaints CSV file or DataFrame.
+            filepath_or_df (str or pd.DataFrame, optional): Path to the complaints CSV file or a DataFrame.
         """
         self.filepath = None
         self.df = None
@@ -35,20 +42,36 @@ class ComplaintAnalyzer:
             except Exception as e:
                 print(f"Error during initialization: {e}")
     
-    def load_complaints_data(self, filepath=None):
+    def load_complaints_data(self, filepath: str = None, chunk_size: int = 100000) -> 'pd.DataFrame | None':
         """
-        Loads the CFPB complaints CSV dataset with error handling.
+        Loads the CFPB complaints CSV dataset with chunked reading to handle large files.
+
         Args:
-            filepath (str): Path to the complaints CSV file.
+            filepath (str, optional): Path to the complaints CSV file. If None, uses self.filepath.
+            chunk_size (int): Number of rows to read at a time. Adjust based on available memory.
+
         Returns:
-            pd.DataFrame: Loaded DataFrame, or None if error occurs.
+            pd.DataFrame or None: Loaded DataFrame, or None if error occurs.
+
+        Raises:
+            FileNotFoundError: If the file is not found.
+            pd.errors.EmptyDataError: If the file is empty.
+            Exception: For other errors during loading.
         """
         if filepath is None:
             filepath = self.filepath
             
         try:
-            # Use chunking for large files if needed, but here we try to load all
-            self.df = pd.read_csv(filepath, low_memory=False)
+            print(f"Loading data in chunks of {chunk_size} rows...")
+            
+            # Read the CSV file in chunks to manage memory usage
+            chunks = []
+            for chunk in pd.read_csv(filepath, low_memory=False, chunksize=chunk_size):
+                # Optionally process each chunk here (e.g., filter, clean, etc.)
+                chunks.append(chunk)
+            
+            # Concatenate all chunks into a single DataFrame
+            self.df = pd.concat(chunks, ignore_index=True)
             print(f"Loaded data with shape: {self.df.shape}")
             return self.df
         except FileNotFoundError:
@@ -59,9 +82,10 @@ class ComplaintAnalyzer:
             print(f"Error loading data: {e}")
         return None
 
-    def initial_eda(self, df=None):
+    def initial_eda(self, df: 'pd.DataFrame | None' = None) -> None:
         """
         Prints initial EDA: head, info, missing values, and basic stats.
+
         Args:
             df (pd.DataFrame, optional): The complaints DataFrame. If None, uses self.df.
         """
@@ -84,9 +108,10 @@ class ComplaintAnalyzer:
         except Exception as e:
             print(f"Error during initial EDA: {e}")
 
-    def plot_product_distribution(self, df=None, save_path=None):
+    def plot_product_distribution(self, df: 'pd.DataFrame | None' = None, save_path: str = None) -> None:
         """
         Plots and shows the distribution of complaints across Products.
+
         Args:
             df (pd.DataFrame, optional): The complaints DataFrame. If None, uses self.df.
             save_path (str, optional): If provided, saves the plot to this path.
@@ -114,15 +139,17 @@ class ComplaintAnalyzer:
         except Exception as e:
             print(f"Error creating product distribution plot: {e}")
 
-    def analyze_narrative_lengths(self, df=None, save_path=None, column_name='Consumer complaint narrative'):
+    def analyze_narrative_lengths(self, df: 'pd.DataFrame | None' = None, save_path: str = None, column_name: str = 'Consumer complaint narrative') -> 'pd.Series | None':
         """
         Calculates and visualizes the length (word count) of Consumer complaint narratives.
+
         Args:
             df (pd.DataFrame, optional): The complaints DataFrame. If None, uses self.df.
             save_path (str, optional): If provided, saves the plot to this path.
             column_name (str): Name of the column containing narratives.
+
         Returns:
-            pd.Series: Series of word counts for narratives.
+            pd.Series or None: Series of word counts for narratives, or None if error occurs.
         """
         if df is None:
             df = self.df
@@ -159,13 +186,15 @@ class ComplaintAnalyzer:
             print(f"Error analyzing narrative lengths: {e}")
             return None
 
-    def count_narrative_presence(self, df=None):
+    def count_narrative_presence(self, df: 'pd.DataFrame | None' = None) -> 'tuple[int | None, int | None]':
         """
         Counts the number of complaints with and without narratives.
+
         Args:
             df (pd.DataFrame, optional): The complaints DataFrame. If None, uses self.df.
+
         Returns:
-            tuple: (with_narrative, without_narrative)
+            tuple: (with_narrative, without_narrative) or (None, None) if error occurs.
         """
         if df is None:
             df = self.df
@@ -189,17 +218,19 @@ class ComplaintAnalyzer:
             print(f"Error counting narrative presence: {e}")
             return None, None
     
-    def get_dataframe(self):
+    def get_dataframe(self) -> 'pd.DataFrame | None':
         """
         Returns the loaded DataFrame.
+
         Returns:
-            pd.DataFrame: The loaded complaints DataFrame.
+            pd.DataFrame or None: The loaded complaints DataFrame, or None if not loaded.
         """
         return self.df
     
-    def set_dataframe(self, df):
+    def set_dataframe(self, df: 'pd.DataFrame') -> None:
         """
         Sets the DataFrame for analysis.
+
         Args:
             df (pd.DataFrame): The complaints DataFrame to analyze.
         """
@@ -209,7 +240,7 @@ class ComplaintAnalyzer:
         except Exception as e:
             print(f"Error setting DataFrame: {e}")
 
-    def filter_dataset(self, df=None):
+    def filter_dataset(self, df: 'pd.DataFrame | None' = None) -> 'pd.DataFrame | None':
         """
         Filters the dataset to meet project requirements:
         - Include only records for the five specified products: Credit card, Personal loan, 
@@ -219,7 +250,7 @@ class ComplaintAnalyzer:
         Args:
             df (pd.DataFrame, optional): The complaints DataFrame. If None, uses self.df.
         Returns:
-            pd.DataFrame: Filtered DataFrame
+            pd.DataFrame or None: Filtered DataFrame, or None if error occurs.
         """
         if df is None:
             df = self.df
@@ -272,7 +303,7 @@ class ComplaintAnalyzer:
             print(f"Error filtering dataset: {e}")
             return None
 
-    def clean_narratives(self, df=None, column_name='Consumer complaint narrative'):
+    def clean_narratives(self, df: 'pd.DataFrame | None' = None, column_name: str = 'Consumer complaint narrative') -> 'pd.DataFrame | None':
         """
         Cleans the text narratives to improve embedding quality.
         This includes:
@@ -286,7 +317,7 @@ class ComplaintAnalyzer:
             df (pd.DataFrame, optional): The complaints DataFrame. If None, uses self.df.
             column_name (str): Name of the column containing narratives.
         Returns:
-            pd.DataFrame: DataFrame with cleaned narratives
+            pd.DataFrame or None: DataFrame with cleaned narratives, or None if error occurs.
         """
         if df is None:
             df = self.df
