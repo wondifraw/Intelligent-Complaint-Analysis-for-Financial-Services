@@ -159,20 +159,5 @@ def demo_integration():
         'value': list(performance.values())
     }
     summary_df = pd.DataFrame(summary_data)
-    summary_path = output_dir / "chunking_summary.csv"
-    summary_df.to_csv(summary_path, index=False)
-    print(f"Saved chunking summary to: {summary_path}")
+    return summary_df
 
-
-def main():
-    """Run all demonstrations."""
-    print("Text Chunking Module Demo")
-    print("=" * 40)
-    
-    demo_basic_chunking()
-    demo_chunking_methods()
-    demo_parameter_experimentation()
-    demo_optimal_strategy()
-    demo_integration()
-    
-    print("\nDemo completed!")
