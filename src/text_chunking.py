@@ -34,6 +34,10 @@ class NarrativeChunkingStrategy:
     
     This class provides multiple chunking approaches optimized for financial
     complaint text analysis, including both LangChain-based and custom methods.
+
+    Example:
+        >>> strategy = NarrativeChunkingStrategy(chunk_size=400, chunk_overlap=100)
+        >>> chunks = strategy.chunk_single_narrative('Long complaint text...')
     """
     
     def __init__(self, 
@@ -56,7 +60,7 @@ class NarrativeChunkingStrategy:
         self._validate_parameters()
         self._initialize_splitter()
     
-    def _validate_parameters(self):
+    def _validate_parameters(self) -> None:
         """
         Validate the chunking parameters to ensure they are reasonable.
         
@@ -78,7 +82,7 @@ class NarrativeChunkingStrategy:
         ]:
             raise ValueError(f"Unsupported chunking method: {self.chunking_method}")
     
-    def _initialize_splitter(self):
+    def _initialize_splitter(self) -> None:
         """
         Initialize the appropriate chunking method based on the selected strategy.
         """
@@ -600,3 +604,4 @@ def experiment_parameters(narratives: List[str],
     except Exception as e:
         logger.error(f"Error in chunking parameter experimentation: {e}")
         return {"all_results": [], "best_configuration": None} 
+    
