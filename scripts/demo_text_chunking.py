@@ -14,15 +14,23 @@ from text_chunking import (
 
 
 def load_complaints_data():
-    """Load financial complaint data from CSV file."""
+    """Load financial complaint data from CSV file using chunked reading."""
     data_path = Path(__file__).parent.parent / "data" / "complaints_processed.csv"
     
     if not data_path.exists():
         raise FileNotFoundError(f"Data file not found: {data_path}")
     
     try:
-        # Load the CSV file
-        df = pd.read_csv(data_path)
+        # Load the CSV file using chunked reading to handle memory issues
+        chunk_size = 100000  # Adjust this number based on your available memory
+        print(f"Loading data in chunks of {chunk_size} rows...")
+        
+        chunks = []
+        for chunk in pd.read_csv(data_path, low_memory=False, chunksize=chunk_size):
+            # Optionally process each chunk here (e.g., filter, clean, etc.)
+            chunks.append(chunk)
+        
+        df = pd.concat(chunks, ignore_index=True)
         print(f"Loaded {len(df)} complaints from {data_path}")
         
         # Check if the narrative column exists
