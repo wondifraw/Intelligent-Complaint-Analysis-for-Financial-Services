@@ -1,3 +1,4 @@
+
 # Intelligent Complaint Analysis for Financial Services
 
 ## Table of Contents
@@ -301,8 +302,9 @@ Contributions are welcome! To contribute:
 Please ensure your code follows the existing style and includes appropriate tests.
 
 ## Contact
-
-For questions, suggestions, or collaboration, feel free to reach out:
-
+*For questins, suggestions, or collaboration, feel free to reach out:
 - GitHub: [yourusername](https://github.com/wondifraw)
 - Email: wondebdu@gmail.com
+
+
+
