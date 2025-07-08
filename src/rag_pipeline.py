@@ -29,6 +29,16 @@ logger = logging.getLogger(__name__)
 class RAGPipeline:
     """
     Modular Retrieval-Augmented Generation (RAG) pipeline for financial complaint analysis.
+
+    This class provides a complete RAG workflow:
+    - Retrieves top-k relevant complaint chunks using an embedding indexer (FAISS/ChromaDB).
+    - Builds prompts for LLMs using a robust template and retrieved context.
+    - Generates answers using a Hugging Face transformer model.
+    - Includes utilities for qualitative evaluation and reporting.
+
+    Usage:
+        rag = RAGPipeline()
+        result = rag.answer_question("What are common credit card complaints?")
     """
     def __init__(self,
                  indexer: Optional[ComplaintEmbeddingIndexer] = None,
@@ -42,7 +52,7 @@ class RAGPipeline:
             indexer (ComplaintEmbeddingIndexer, optional): Pre-initialized embedding indexer. If None, a new one is created.
             llm_model (str): Hugging Face model name for generation.
             device (int): Device for LLM (-1 for CPU, 0+ for GPU).
-            top_k (int): Number of chunks to retrieve.
+            top_k (int): Number of chunks to retrieve for each query.
         """
         self.indexer = indexer or create_embedding_indexer()
         self.top_k = top_k
@@ -67,7 +77,7 @@ class RAGPipeline:
 
     def retrieve(self, question: str) -> List[Dict[str, Any]]:
         """
-        Retrieve top-k relevant complaint chunks for a user question.
+        Retrieve top-k relevant complaint chunks for a user question using semantic similarity search.
 
         Args:
             question (str): User's question.
@@ -87,6 +97,7 @@ class RAGPipeline:
     def build_prompt(self, question: str, retrieved_chunks: List[Dict[str, Any]]) -> str:
         """
         Build the prompt for the LLM using the template, context, and question.
+
         Args:
             question (str): User's question.
             retrieved_chunks (List[dict]): Retrieved chunk dicts.
@@ -100,10 +111,11 @@ class RAGPipeline:
     def generate(self, prompt: str) -> str:
         """
         Generate an answer from the LLM given the prompt.
+
         Args:
             prompt (str): Prompt string for the LLM.
         Returns:
-            str: Generated answer.
+            str: Generated answer from the LLM, or an error message if generation fails.
         """
         if not self.generator:
             logger.error("LLM generator pipeline is not available.")
@@ -119,11 +131,12 @@ class RAGPipeline:
 
     def answer_question(self, question: str) -> Dict[str, Any]:
         """
-        Complete RAG pipeline: retrieve, build prompt, generate answer.
+        Complete RAG pipeline: retrieve relevant chunks, build prompt, and generate answer.
+
         Args:
             question (str): User's question.
         Returns:
-            dict: { 'question', 'answer', 'retrieved_sources' }
+            dict: Dictionary with keys 'question', 'answer', and 'retrieved_sources' (top 2 chunks).
         """
         retrieved = self.retrieve(question)
         prompt = self.build_prompt(question, retrieved)
@@ -137,12 +150,13 @@ class RAGPipeline:
     @staticmethod
     def qualitative_evaluation(rag_pipeline, questions: List[str]) -> List[Dict[str, Any]]:
         """
-        Run qualitative evaluation for a list of questions.
+        Run qualitative evaluation for a list of questions using the RAG pipeline.
+
         Args:
-            rag_pipeline (RAGPipeline): The RAG pipeline instance.
+            rag_pipeline (RAGPipeline): The RAG pipeline instance to use for answering questions.
             questions (List[str]): List of questions to evaluate.
         Returns:
-            List[dict]: List of evaluation results with question, answer, sources.
+            List[dict]: List of evaluation results, each with question, answer, and sources.
         """
         results = []
         for q in questions:
@@ -157,11 +171,12 @@ class RAGPipeline:
     @staticmethod
     def evaluation_table(results: List[Dict[str, Any]]) -> str:
         """
-        Create a Markdown evaluation table for reporting.
+        Create a Markdown evaluation table for reporting RAG pipeline results.
+
         Args:
-            results (List[dict]): List of evaluation results.
+            results (List[dict]): List of evaluation results (from qualitative_evaluation).
         Returns:
-            str: Markdown table as a string.
+            str: Markdown table as a string, suitable for reporting or display.
         """
         header = "| Question | Generated Answer | Retrieved Sources | Quality Score (1-5) | Comments/Analysis |\n"
         header += "|---|---|---|---|---|\n"
