@@ -1,6 +1,7 @@
 
 # Intelligent Complaint Analysis for Financial Services
 
+
 ## Table of Contents
 - [Summary](#summary)
 - [Quickstart](#quickstart)
@@ -57,35 +58,46 @@ The codebase is designed for extensibility, reproducibility, and ease of use, wi
    jupyter notebook notebooks/eda_preprocessing_demo.ipynb
    ```
 
+**Troubleshooting Tips:**
+- If you encounter `ModuleNotFoundError`, ensure you are in the correct virtual environment and dependencies are installed.
+- If Jupyter is not found, run `pip install notebook`.
+- If data files are missing, download the latest [CFPB Consumer Complaint Database](https://www.consumerfinance.gov/data-research/consumer-complaints/) and place it in the `data/` folder as `complaints.csv`.
+
 ---
 
 ## Project Structure 
 
 ```
 Intelligent-Complaint-Analysis-for-Financial-Services/
-├── data/                           # Data files
-│   ├── complaints.csv              # Raw CFPB complaints data
-│   ├── complaints_processed.csv    # Processed dataset (generated)
+├── data/                           # Raw and processed data files
+│   ├── complaints.csv              # Raw CFPB complaints data (downloaded)
+│   ├── complaints_processed.csv    # Cleaned and filtered dataset (generated)
 │   ├── chunked_narratives.csv      # Chunked narratives (generated)
 │   └── chunking_summary.csv        # Chunking statistics (generated)
-├── notebooks/
-│   ├── eda_preprocessing_demo.ipynb # Jupyter notebook with EDA workflow
-│   └── text_chunking_demo.ipynb    # Jupyter notebook with chunking workflow
-├── src/
-│   ├── eda_preprocessing.py        # ComplaintAnalyzer class
-│   ├── text_chunking.py            # Text chunking functionality
-│   └── embedding_indexing.py       # Embedding and indexing functionality
-├── scripts/
-│   ├── demo_text_chunking.py       # Text chunking demo script
-│   ├── demo_embedding_indexing.py  # Embedding and indexing demo script
-│   └── integration_demo.py         # Complete workflow demo script
-├── tests/                          # Test files
-│   ├── test_constructor.py         # Constructor tests
-│   ├── test_text_chunking.py       # Text chunking tests
-│   └── test_embedding_indexing.py  # Embedding and indexing tests
-├── docs/
-│   └── embedding_indexing_report.md # Detailed implementation report
-└── README.md                       # This file
+├── notebooks/                      # Interactive Jupyter notebooks for EDA, chunking, RAG
+│   ├── eda_preprocessing_demo.ipynb
+│   ├── text_chunking_demo.ipynb
+│   └── rag_pipeline_demo.ipynb
+├── src/                            # Source code modules
+│   ├── eda_preprocessing.py        # ComplaintAnalyzer class for EDA & cleaning
+│   ├── text_chunking.py            # Text chunking strategies
+│   ├── embedding_indexing.py       # Embedding and vector indexing
+│   └── apps/                       # Streamlit chat app, tests, and docs
+│       ├── chat_app.py             # Main Streamlit chat interface
+│       ├── test_chat.py            # Unit tests for chat app
+│       └── README.md               # Streamlit app documentation
+├── scripts/                        # Demo and integration scripts
+│   ├── demo_text_chunking.py
+│   ├── demo_embedding_indexing.py
+│   └── integration_demo.py
+├── tests/                          # Unit and integration tests
+│   ├── test_constructor.py
+│   ├── test_text_chunking.py
+│   ├── test_embedding_indexing.py
+│   └── test_embedding_fix.py
+├── vector_store/                   # Vector database files (if using ChromaDB locally)
+├── README.md                       # Project documentation
+└── requirements.txt                # Python dependencies
 ```
 
 ## Features
@@ -143,6 +155,39 @@ State-of-the-art embedding and semantic search capabilities:
 - `search_complaints_by_topic()` - Topic-based search with filtering
 - `get_collection_stats()` - Get vector store statistics
 
+## Streamlit Chat App: Financial Complaint Analysis
+
+A user-friendly web interface for interacting with the RAG-based financial complaint analysis system.
+
+**Key Features:**
+- 🤖 AI-powered answers to questions about financial complaints
+- 📚 Source document display for transparency
+- 💬 Real-time chat interface with session management
+- 🎛️ Sidebar controls for clearing chat and refreshing the system
+- ⚡ Robust error handling and user guidance
+
+**How to Launch:**
+```bash
+streamlit run src/apps/chat_app.py
+```
+
+**How to Use:**
+1. Type your question in the chat input (e.g., "What are common credit card complaints?")
+2. View AI-generated answers and supporting sources
+3. Use sidebar controls to clear chat or refresh the system
+
+**Example Questions:**
+- "What are common credit card complaints?"
+- "How do customers feel about loan services?"
+- "What issues do people have with banking apps?"
+
+**Testing the App:**
+```bash
+python src/apps/test_chat.py
+```
+
+For more details, see [`src/apps/README.md`](src/apps/README.md).
+
 ## Workflow
 
 The recommended workflow follows this order:
@@ -165,6 +210,27 @@ The recommended workflow follows this order:
 11. **Semantic Search** - Enable similarity search and topic-based retrieval
 
 ## Usage
+
+### Example Output
+
+- **Product Distribution Plot:**
+  ![Sample Product Distribution](https://raw.githubusercontent.com/yourusername/Intelligent-Complaint-Analysis-for-Financial-Services/main/docs/sample_product_distribution.png)
+- **Sample Semantic Search Result:**
+  ```json
+  [
+    {
+      "complaint_id": 123456,
+      "narrative": "I was charged twice for a single transaction...",
+      "similarity_score": 0.92
+    },
+    ...
+  ]
+  ```
+
+### Extending the Pipeline
+- Add new chunking strategies by subclassing `NarrativeChunkingStrategy` in `src/text_chunking.py`.
+- Swap embedding models by editing `src/embedding_indexing.py`.
+- Integrate with other vector stores (e.g., Pinecone, Weaviate) by adapting the indexer class.
 
 ### Using the Jupyter Notebooks
 
@@ -292,19 +358,20 @@ pip install -r requirements.txt
 
 ## Contributing
 
-Contributions are welcome! To contribute:
-1. Fork the repository
-2. Create a new branch (`git checkout -b feature/your-feature`)
-3. Commit your changes (`git commit -am 'Add new feature'`)
-4. Push to the branch (`git push origin feature/your-feature`)
-5. Open a pull request
-
-Please ensure your code follows the existing style and includes appropriate tests.
+- Please review the [Code of Conduct](https://github.com/yourusername/Intelligent-Complaint-Analysis-for-Financial-Services/blob/main/CODE_OF_CONDUCT.md) before contributing.
+- Run `pre-commit` hooks if configured: `pip install pre-commit && pre-commit run --all-files`.
 
 ## Contact
-*For questins, suggestions, or collaboration, feel free to reach out:
-- GitHub: [yourusername](https://github.com/wondifraw)
-- Email: wondebdu@gmail.com
+*For questions, suggestions, or collaboration, feel free to reach out:*
+- GitHub: [wondifraw](https://github.com/wondifraw)
+- Email: [wondebdu@gmail.com](mailto:wondebdu@gmail.com)
+
+## Acknowledgements
+- [CFPB Consumer Complaint Database](https://www.consumerfinance.gov/data-research/consumer-complaints/)
+- [Sentence Transformers](https://www.sbert.net/)
+- [FAISS](https://github.com/facebookresearch/faiss)
+- [ChromaDB](https://docs.trychroma.com/)
+- [LangChain](https://python.langchain.com/)
 
 
 
