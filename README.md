@@ -373,5 +373,43 @@ pip install -r requirements.txt
 - [ChromaDB](https://docs.trychroma.com/)
 - [LangChain](https://python.langchain.com/)
 
+## Project Goals
+- Enable financial institutions and regulators to extract actionable insights from large-scale consumer complaint data.
+- Provide a modular, reproducible pipeline for complaint analysis, from raw data to semantic search and interactive exploration.
+- Support research and operational use cases: trend detection, compliance monitoring, customer support, and risk management.
+
+## Methodology
+1. **Data Ingestion & EDA:** Load and explore CFPB complaint data, analyze product distribution, and narrative statistics.
+2. **Data Cleaning & Preprocessing:** Filter for relevant products, remove low-quality narratives, and clean text for NLP tasks.
+3. **Text Chunking:** Apply flexible chunking strategies to break long narratives into manageable, semantically meaningful pieces.
+4. **Embedding Generation:** Use transformer-based models to convert text chunks into high-dimensional vectors.
+5. **Vector Indexing & Semantic Search:** Store embeddings in a vector database (ChromaDB/FAISS) for fast similarity search and topic retrieval.
+6. **RAG Pipeline & Chat App:** Integrate retrieval-augmented generation (RAG) for interactive Q&A and analysis via a Streamlit chat interface.
+
+## Project Architecture
+```mermaid
+flowchart TD
+    A["User Complaint Data"] --> B["Preprocessing & EDA"]
+    B --> C["Text Chunking"]
+    C --> D["Embedding & Indexing"]
+    D --> E["Vector Store"]
+    E --> F["RAG Pipeline"]
+    F --> G["Chat App / Analysis Interface"]
+```
+
+## Evaluation Metrics
+- **Data Quality:**
+  - % of complaints retained after filtering and cleaning
+  - Distribution of narrative lengths before/after cleaning
+- **Chunking Effectiveness:**
+  - Average chunk size, overlap, and coverage
+  - Processing speed (chunks/sec)
+- **Embedding & Search Quality:**
+  - Semantic search accuracy (manual or benchmarked)
+  - Latency of similarity search queries
+- **User Experience:**
+  - Chat app response time
+  - User feedback on answer relevance and transparency
+
 
 
